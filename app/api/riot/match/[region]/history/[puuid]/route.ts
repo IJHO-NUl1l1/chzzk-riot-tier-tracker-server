@@ -3,26 +3,7 @@
  */
 import { NextRequest } from 'next/server';
 import axios from 'axios';
-import { getRegionHost } from '../../../../../../../lib/riot-api';
-
-// Map region to routing value for match-v5 API
-function getRoutingValue(region: string): string {
-  const regionMapping: Record<string, string> = {
-    'br': 'americas',
-    'eune': 'europe',
-    'euw': 'europe',
-    'jp': 'asia',
-    'kr': 'asia',
-    'lan': 'americas',
-    'las': 'americas',
-    'na': 'americas',
-    'oce': 'sea',
-    'tr': 'europe',
-    'ru': 'europe',
-  };
-  
-  return regionMapping[region.toLowerCase()] || 'asia';
-}
+import { getRoutingValue } from '../../../../../../../lib/riot-api';
 
 // In Next.js 16, params is a Promise that needs to be awaited
 export async function GET(
