@@ -90,7 +90,7 @@ export default function LinkedApiTest() {
 
   return (
     <div className="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 mb-6">
-      <h2 className="text-xl font-semibold mb-4 text-blue-300">LoL Riot ID 기반 연계 테스트</h2>
+      <h2 className="text-xl font-semibold mb-4 text-blue-300">LoL API Test</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <div>

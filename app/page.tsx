@@ -66,7 +66,7 @@ export default function Home() {
         </div>
         
         <footer className="mt-16 text-gray-500 text-sm">
-          <p> 2024 Chzzk LoL Tier Server. Not affiliated with Riot Games.</p>
+          <p> 2026 Chzzk LoL Tier Server. Not affiliated with Riot Games.</p>
           <p className="mt-1">League of Legends and Riot Games are trademarks or registered trademarks of Riot Games, Inc.</p>
         </footer>
       </div>

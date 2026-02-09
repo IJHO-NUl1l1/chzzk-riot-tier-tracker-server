@@ -2,19 +2,19 @@ export default function TermsPage() {
   return (
     <main className="max-w-3xl mx-auto px-6 py-12">
       <h1 className="text-3xl font-bold mb-8">서비스 이용약관</h1>
-      <p className="text-sm text-gray-400 mb-8">최종 수정일: 2025년 2월 7일</p>
+      <p className="text-sm text-gray-400 mb-8">최종 수정일: 2026년 2월 7일</p>
 
       <section className="mb-8">
         <h2 className="text-xl font-semibold mb-3">제1조 (목적)</h2>
         <p className="text-gray-300 leading-relaxed">
-          본 약관은 Chzzk LoL Tier(이하 &quot;서비스&quot;)의 이용 조건 및 절차에 관한 사항을 규정합니다.
+          본 약관은 Chzzk Riot Tier Tracker(이하 &quot;서비스&quot;)의 이용 조건 및 절차에 관한 사항을 규정합니다.
         </p>
       </section>
 
       <section className="mb-8">
         <h2 className="text-xl font-semibold mb-3">제2조 (서비스 내용)</h2>
         <p className="text-gray-300 leading-relaxed">
-          서비스는 치지직(Chzzk) 라이브 채팅에서 리그 오브 레전드 랭크 정보를 표시하는 브라우저 확장 프로그램입니다.
+          서비스는 치지직(Chzzk) 라이브 채팅에서 LoL/TFT 랭크 정보를 표시하는 브라우저 확장 프로그램입니다.
         </p>
         <ul className="list-disc list-inside text-gray-300 mt-2 space-y-1">
           <li>Riot Games 계정 연동을 통한 랭크 정보 조회</li>
@@ -51,7 +51,7 @@ export default function TermsPage() {
         <p className="text-gray-300 leading-relaxed">
           서비스 이용 관련 문의는 아래 이메일로 연락해 주세요.
         </p>
-        <p className="text-gray-300 mt-2">이메일: contact@chzzk-lol-tier.com</p>
+        <p className="text-gray-300 mt-2">이메일: x8608666@gmail.com</p>
       </section>
     </main>
   );
