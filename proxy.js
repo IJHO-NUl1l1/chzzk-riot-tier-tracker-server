@@ -1,5 +1,5 @@
 /**
- * Global middleware
+ * Global proxy (Next.js 16)
  */
 import { NextResponse } from 'next/server';
 
@@ -12,7 +12,7 @@ const RATE_LIMIT = {
   max: 60 // 60 requests per minute
 };
 
-export function middleware(request) {
+export function proxy(request) {
   // Add CORS headers
   const response = NextResponse.next();
   
