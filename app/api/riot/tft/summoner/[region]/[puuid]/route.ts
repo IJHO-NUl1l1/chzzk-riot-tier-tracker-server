@@ -31,9 +31,12 @@ export async function GET(
     }
 
     const url = `https://${regionHost}/tft/summoner/v1/summoners/by-puuid/${encodeURIComponent(puuid)}`;
+    console.log('TFT Summoner API URL:', url);
+    console.log('TFT API Key available:', !!process.env.RIOT_TFT_API_KEY);
     const response = await axios.get(url, { headers });
     return Response.json(response.data);
   } catch (error: any) {
+    console.error('TFT Summoner error:', error.response?.status, error.response?.data);
     const status = error.response?.status || 500;
     return Response.json({
       error: error.message || 'Failed to get TFT summoner info',

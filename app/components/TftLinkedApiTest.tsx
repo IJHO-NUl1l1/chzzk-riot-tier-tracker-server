@@ -3,22 +3,18 @@
 import { useState } from 'react';
 import ApiResponseVisualizer from './ApiResponseVisualizer';
 
-interface TftLinkedApiTestProps {
-  initialPuuid?: string;
-  region?: string;
-}
-
-export default function TftLinkedApiTest({ initialPuuid = '', region = 'kr' }: TftLinkedApiTestProps) {
-  const [puuid, setPuuid] = useState(initialPuuid);
-  const [selectedRegion, setSelectedRegion] = useState(region);
+export default function TftLinkedApiTest() {
+  const [gameName, setGameName] = useState('Hide on bush');
+  const [tagLine, setTagLine] = useState('KR1');
+  const [selectedRegion, setSelectedRegion] = useState('kr');
   const [step, setStep] = useState(0);
   const [results, setResults] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const runLinkedTest = async () => {
-    if (!puuid) {
-      setError('PUUID is required');
+    if (!gameName || !tagLine) {
+      setError('Game Name and Tag Line are required');
       return;
     }
 
@@ -28,7 +24,19 @@ export default function TftLinkedApiTest({ initialPuuid = '', region = 'kr' }: T
     setResults({});
 
     try {
-      // 1. TFT 소환사 정보 조회
+      // 1. TFT 키로 Account 조회 → PUUID 획득
+      const accountResponse = await fetch(`/api/riot/tft/account/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}?region=${selectedRegion}`);
+      const accountData = await accountResponse.json();
+
+      if (accountData.error) {
+        throw new Error(`TFT Account API error: ${accountData.error}`);
+      }
+
+      const puuid = accountData.puuid;
+      setResults(prev => ({ ...prev, account: accountData }));
+      setStep(2);
+
+      // 2. TFT 소환사 정보 조회
       const summonerResponse = await fetch(`/api/riot/tft/summoner/${selectedRegion}/${encodeURIComponent(puuid)}`);
       const summonerData = await summonerResponse.json();
 
@@ -37,9 +45,9 @@ export default function TftLinkedApiTest({ initialPuuid = '', region = 'kr' }: T
       }
 
       setResults(prev => ({ ...prev, summoner: summonerData }));
-      setStep(2);
+      setStep(3);
 
-      // 2. TFT 랭크 정보 조회
+      // 3. TFT 랭크 정보 조회
       const leagueResponse = await fetch(`/api/riot/tft/league/${selectedRegion}/${encodeURIComponent(puuid)}`);
       const leagueData = await leagueResponse.json();
 
@@ -48,9 +56,9 @@ export default function TftLinkedApiTest({ initialPuuid = '', region = 'kr' }: T
       }
 
       setResults(prev => ({ ...prev, league: leagueData }));
-      setStep(3);
+      setStep(4);
 
-      // 3. TFT 매치 히스토리 조회 (최근 5개)
+      // 4. TFT 매치 히스토리 조회 (최근 5개)
       const matchHistoryResponse = await fetch(`/api/riot/tft/match/${selectedRegion}/history/${encodeURIComponent(puuid)}?count=5`);
       const matchHistoryData = await matchHistoryResponse.json();
 
@@ -59,7 +67,7 @@ export default function TftLinkedApiTest({ initialPuuid = '', region = 'kr' }: T
       }
 
       setResults(prev => ({ ...prev, matchHistory: matchHistoryData }));
-      setStep(4);
+      setStep(5);
 
     } catch (error: any) {
       console.error('TFT Linked API test error:', error);
@@ -71,17 +79,28 @@ export default function TftLinkedApiTest({ initialPuuid = '', region = 'kr' }: T
 
   return (
     <div className="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 mb-6">
-      <h2 className="text-xl font-semibold mb-4 text-purple-300">TFT PUUID 기반 연계 테스트</h2>
+      <h2 className="text-xl font-semibold mb-4 text-purple-300">TFT Riot ID 기반 연계 테스트</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <div>
-          <label className="block text-sm font-medium mb-1 text-purple-300">PUUID</label>
+          <label className="block text-sm font-medium mb-1 text-purple-300">Game Name</label>
           <input
             type="text"
             className="w-full p-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:border-purple-500 focus:ring focus:ring-purple-500 focus:ring-opacity-50"
-            value={puuid}
-            onChange={(e) => setPuuid(e.target.value)}
-            placeholder="Enter PUUID"
+            value={gameName}
+            onChange={(e) => setGameName(e.target.value)}
+            placeholder="Hide on bush"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1 text-purple-300">Tag Line</label>
+          <input
+            type="text"
+            className="w-full p-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:border-purple-500 focus:ring focus:ring-purple-500 focus:ring-opacity-50"
+            value={tagLine}
+            onChange={(e) => setTagLine(e.target.value)}
+            placeholder="KR1"
           />
         </div>
 
@@ -105,7 +124,7 @@ export default function TftLinkedApiTest({ initialPuuid = '', region = 'kr' }: T
       <button
         className="bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white py-3 px-6 rounded-lg shadow-lg transition-all flex items-center justify-center gap-2 w-full sm:w-auto"
         onClick={runLinkedTest}
-        disabled={loading || !puuid}
+        disabled={loading || !gameName || !tagLine}
       >
         {loading ? (
           <>
@@ -143,13 +162,16 @@ export default function TftLinkedApiTest({ initialPuuid = '', region = 'kr' }: T
             <div className="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden">
               <div
                 className="h-full bg-purple-600 rounded-full transition-all duration-500"
-                style={{ width: `${(step / 4) * 100}%` }}
+                style={{ width: `${(step / 5) * 100}%` }}
               ></div>
             </div>
-            <span className="ml-2 text-sm text-gray-400">{step}/4</span>
+            <span className="ml-2 text-sm text-gray-400">{step}/5</span>
           </div>
 
           <div className="flex flex-wrap gap-2 mb-4">
+            <div className={`px-3 py-1 rounded-full text-xs font-medium ${results.account ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-400'}`}>
+              Account (PUUID)
+            </div>
             <div className={`px-3 py-1 rounded-full text-xs font-medium ${results.summoner ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-400'}`}>
               TFT Summoner
             </div>
@@ -164,6 +186,10 @@ export default function TftLinkedApiTest({ initialPuuid = '', region = 'kr' }: T
       )}
 
       {/* Results */}
+      {results.account && (
+        <ApiResponseVisualizer data={results.account} title="TFT Account (PUUID)" />
+      )}
+
       {results.summoner && (
         <ApiResponseVisualizer data={results.summoner} title="TFT Summoner Information" />
       )}
