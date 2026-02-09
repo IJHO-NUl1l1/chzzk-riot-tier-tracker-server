@@ -23,7 +23,7 @@ export async function GET(
     const count = searchParams.get('count') ? parseInt(searchParams.get('count') as string) : undefined;
     
     console.log('Request parameters:', { region, puuid, count });
-    console.log('API Key available:', !!process.env.RIOT_API_KEY);
+    console.log('API Key available:', !!process.env.RIOT_LOL_API_KEY);
     
     // Validate parameters
     if (!region || !puuid) {
@@ -35,9 +35,9 @@ export async function GET(
       const headers: Record<string, string> = {};
       
       // Use API key for authentication
-      if (process.env.RIOT_API_KEY) {
+      if (process.env.RIOT_LOL_API_KEY) {
         console.log('Using API key for authentication');
-        headers['X-Riot-Token'] = process.env.RIOT_API_KEY;
+        headers['X-Riot-Token'] = process.env.RIOT_LOL_API_KEY;
       } else {
         console.log('No API key available');
         throw new Error('No API key available');

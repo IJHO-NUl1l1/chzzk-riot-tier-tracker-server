@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import ApiResponseVisualizer from '../components/ApiResponseVisualizer';
 import LinkedApiTest from '../components/LinkedApiTest';
+import TftLinkedApiTest from '../components/TftLinkedApiTest';
 
 export default function TestPage() {
   const [summonerName, setSummonerName] = useState('Hide on bush');
@@ -10,7 +11,7 @@ export default function TestPage() {
   const [region, setRegion] = useState('kr');
   const [apiResult, setApiResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'account' | 'linked'>('account');
+  const [activeTab, setActiveTab] = useState<'account' | 'linked' | 'tft'>('account');
 
   // Fetch summoner information
   const fetchSummonerInfo = async () => {
@@ -72,6 +73,14 @@ export default function TestPage() {
                 : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'}`}
             >
               Linked API Tests
+            </button>
+            <button
+              onClick={() => setActiveTab('tft')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'tft'
+                ? 'border-purple-500 text-purple-400'
+                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'}`}
+            >
+              TFT Linked API Tests
             </button>
           </nav>
         </div>
@@ -150,8 +159,10 @@ export default function TestPage() {
             <ApiResponseVisualizer data={apiResult} title="Account Information" />
           )}
         </>
-      ) : (
+      ) : activeTab === 'linked' ? (
         <LinkedApiTest />
+      ) : (
+        <TftLinkedApiTest />
       )}
 
       <footer className="mt-12 text-center text-gray-500 text-sm">
