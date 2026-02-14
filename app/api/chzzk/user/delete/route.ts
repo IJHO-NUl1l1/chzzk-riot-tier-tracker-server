@@ -32,7 +32,7 @@ export async function DELETE(request: NextRequest) {
         body: JSON.stringify({
           clientId,
           clientSecret,
-          accessToken: tokenRecord.access_token,
+          token: tokenRecord.access_token,
         }),
       }).catch(() => {}); // Best-effort revoke
     }

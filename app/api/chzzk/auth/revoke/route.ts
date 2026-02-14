@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     body: JSON.stringify({
       clientId,
       clientSecret,
-      accessToken: tokenRecord.access_token,
+      token: tokenRecord.access_token,
     }),
   });
 
