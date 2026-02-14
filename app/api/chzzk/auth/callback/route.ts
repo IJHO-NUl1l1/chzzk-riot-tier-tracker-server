@@ -4,7 +4,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { supabase } from '@/lib/supabase';
+import { getSupabase } from '@/lib/supabase';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 3. UPSERT user in users table
-    const { data: user, error: userError } = await supabase
+    const { data: user, error: userError } = await getSupabase()
       .from('users')
       .upsert(
         {
@@ -107,7 +107,7 @@ export async function GET(request: NextRequest) {
     // 4. UPSERT tokens in chzzk_tokens table
     const expiresAt = new Date(Date.now() + expiresIn * 1000).toISOString();
 
-    const { error: tokenError } = await supabase
+    const { error: tokenError } = await getSupabase()
       .from('chzzk_tokens')
       .upsert(
         {
