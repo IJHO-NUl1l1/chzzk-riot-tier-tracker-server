@@ -62,5 +62,7 @@ export async function POST(request: NextRequest) {
   return Response.json({
     message: 'Token revoked and deleted',
     chzzkRevoke: revokeResponse.ok ? 'success' : 'failed',
+    chzzkRevokeStatus: revokeResponse.status,
+    chzzkRevokeDetail: revokeData,
   });
 }
