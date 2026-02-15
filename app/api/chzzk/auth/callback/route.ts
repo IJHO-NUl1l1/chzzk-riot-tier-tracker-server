@@ -127,9 +127,13 @@ export async function GET(request: NextRequest) {
       }, { status: 500 });
     }
 
-    // 5. Clear cookies and redirect
-    const redirectPath = cookieStore.get('chzzk_oauth_redirect')?.value || '/auth/success';
-    const response = NextResponse.redirect(new URL(redirectPath, request.url));
+    // 5. Clear cookies and redirect with user info
+    const basePath = cookieStore.get('chzzk_oauth_redirect')?.value || '/auth/success';
+    const redirectUrl = new URL(basePath, request.url);
+    redirectUrl.searchParams.set('channelId', channelId);
+    redirectUrl.searchParams.set('channelName', channelName || '');
+    redirectUrl.searchParams.set('userId', String(user.id));
+    const response = NextResponse.redirect(redirectUrl.toString());
     response.cookies.delete('chzzk_oauth_state');
     response.cookies.delete('chzzk_oauth_redirect');
 
