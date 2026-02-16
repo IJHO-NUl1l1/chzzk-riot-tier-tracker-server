@@ -1,7 +1,7 @@
 /**
- * Chzzk User Lookup API
- * GET /api/chzzk/user?channelName=닉네임
- * Returns user info + token status from DB
+ * Chzzk User API
+ * GET /api/chzzk/user?channelName=닉네임 — Returns user info + token status
+ * PATCH /api/chzzk/user — Updates riot account fields for a user
  */
 import { NextRequest } from 'next/server';
 import { getSupabase } from '@/lib/supabase';
@@ -43,4 +43,44 @@ export async function GET(request: NextRequest) {
     user,
     chzzkToken: tokenStatus,
   });
+}
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { userId, riotPuuid, riotGameName, riotTagLine, riotRegion } = body;
+
+    if (!userId) {
+      return Response.json({ error: 'userId is required' }, { status: 400 });
+    }
+
+    const updateData: Record<string, string | null> = {
+      riot_puuid: riotPuuid ?? null,
+      riot_game_name: riotGameName ?? null,
+      riot_tag_line: riotTagLine ?? null,
+      riot_region: riotRegion ?? null,
+      updated_at: new Date().toISOString(),
+    };
+
+    const { data, error } = await getSupabase()
+      .from('users')
+      .update(updateData)
+      .eq('id', userId)
+      .select('id, riot_puuid, riot_game_name, riot_tag_line, riot_region')
+      .single();
+
+    if (error || !data) {
+      return Response.json({
+        error: 'Failed to update user',
+        details: error?.message,
+      }, { status: 500 });
+    }
+
+    return Response.json({ user: data });
+  } catch (error: any) {
+    return Response.json({
+      error: 'Invalid request body',
+      message: error.message,
+    }, { status: 400 });
+  }
 }
