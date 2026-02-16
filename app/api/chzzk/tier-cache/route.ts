@@ -1,7 +1,8 @@
 /**
  * Tier Cache API
- * GET  /api/chzzk/tier-cache?chzzkChannelId=xxx — Check if tier_cache entries exist for a user
- * POST /api/chzzk/tier-cache — Upsert LoL/TFT tier data into tier_cache table
+ * GET    /api/chzzk/tier-cache?chzzkChannelId=xxx — Check if tier_cache entries exist for a user
+ * POST   /api/chzzk/tier-cache — Upsert LoL/TFT tier data into tier_cache table
+ * DELETE /api/chzzk/tier-cache?chzzkChannelId=xxx[&gameType=lol|tft] — Delete tier_cache entries (Unlink)
  */
 import { NextRequest } from 'next/server';
 import { getSupabase } from '@/lib/supabase';
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest) {
     // Verify the user exists
     const { data: user, error: userError } = await getSupabase()
       .from('users')
-      .select('id, chzzk_channel_id, riot_puuid')
+      .select('id, chzzk_channel_id')
       .eq('chzzk_channel_id', chzzkChannelId)
       .single();
 
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
             riot_tag_line: tagLine ?? null,
             cached_at: new Date().toISOString(),
           },
-          { onConflict: 'riot_puuid,game_type' }
+          { onConflict: 'chzzk_channel_id,game_type' }
         )
         .select()
         .single();
@@ -103,4 +104,33 @@ export async function POST(request: NextRequest) {
       message: error.message,
     }, { status: 400 });
   }
+}
+
+export async function DELETE(request: NextRequest) {
+  const chzzkChannelId = request.nextUrl.searchParams.get('chzzkChannelId');
+  const gameType = request.nextUrl.searchParams.get('gameType');
+
+  if (!chzzkChannelId) {
+    return Response.json({ error: 'chzzkChannelId parameter is required' }, { status: 400 });
+  }
+
+  let query = getSupabase()
+    .from('tier_cache')
+    .delete()
+    .eq('chzzk_channel_id', chzzkChannelId);
+
+  if (gameType) {
+    if (!['lol', 'tft'].includes(gameType)) {
+      return Response.json({ error: 'gameType must be "lol" or "tft"' }, { status: 400 });
+    }
+    query = query.eq('game_type', gameType);
+  }
+
+  const { error } = await query;
+
+  if (error) {
+    return Response.json({ error: error.message }, { status: 500 });
+  }
+
+  return Response.json({ success: true });
 }
