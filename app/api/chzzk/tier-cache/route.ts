@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
 
   const { data, error } = await getSupabase()
     .from('tier_cache')
-    .select('game_type, tier, rank, league_points, riot_puuid, cached_at')
+    .select('game_type, tier, rank, league_points, riot_puuid, riot_game_name, riot_tag_line, cached_at')
     .eq('chzzk_channel_id', chzzkChannelId);
 
   if (error) {
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     const results = [];
 
     for (const entry of entries) {
-      const { riotPuuid, gameType, queueType, tier, rank, leaguePoints, wins, losses } = entry;
+      const { riotPuuid, gameType, queueType, tier, rank, leaguePoints, wins, losses, gameName, tagLine } = entry;
 
       if (!riotPuuid || !gameType) {
         results.push({ gameType: gameType ?? 'unknown', error: 'riotPuuid and gameType are required' });
@@ -80,6 +80,8 @@ export async function POST(request: NextRequest) {
             league_points: leaguePoints ?? 0,
             wins: wins ?? 0,
             losses: losses ?? 0,
+            riot_game_name: gameName ?? null,
+            riot_tag_line: tagLine ?? null,
             cached_at: new Date().toISOString(),
           },
           { onConflict: 'riot_puuid,game_type' }
