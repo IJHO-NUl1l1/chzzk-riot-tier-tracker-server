@@ -1,9 +1,32 @@
 /**
  * Tier Cache API
+ * GET  /api/chzzk/tier-cache?chzzkChannelId=xxx — Check if tier_cache entries exist for a user
  * POST /api/chzzk/tier-cache — Upsert LoL/TFT tier data into tier_cache table
  */
 import { NextRequest } from 'next/server';
 import { getSupabase } from '@/lib/supabase';
+
+export async function GET(request: NextRequest) {
+  const chzzkChannelId = request.nextUrl.searchParams.get('chzzkChannelId');
+
+  if (!chzzkChannelId) {
+    return Response.json({ error: 'chzzkChannelId parameter is required' }, { status: 400 });
+  }
+
+  const { data, error } = await getSupabase()
+    .from('tier_cache')
+    .select('game_type, tier, rank, league_points, riot_puuid, cached_at')
+    .eq('chzzk_channel_id', chzzkChannelId);
+
+  if (error) {
+    return Response.json({ error: error.message }, { status: 500 });
+  }
+
+  return Response.json({
+    linked: data.length > 0,
+    entries: data,
+  });
+}
 
 export async function POST(request: NextRequest) {
   try {
