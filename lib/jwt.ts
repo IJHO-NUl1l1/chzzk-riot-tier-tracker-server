@@ -7,6 +7,8 @@ if (!JWT_SECRET) {
   throw new Error('JWT_SECRET 환경변수가 설정되지 않았습니다. .env 파일을 확인하세요.');
 }
 
+const SECRET: string = JWT_SECRET;
+
 /**
  * 치지직 사용자 전용 JWT 생성
  * @param channelId 치지직 channel ID (sub로 사용)
@@ -26,8 +28,8 @@ export function generateChzzkJwt(
     iat: Math.floor(Date.now() / 1000),
   };
 
-  return jwt.sign(payload, JWT_SECRET, {
-    expiresIn,
+  return jwt.sign(payload, SECRET, {
+    expiresIn: expiresIn as any,
     algorithm: 'HS256',
   });
 }
@@ -54,8 +56,8 @@ export function generateRiotJwt(
     iat: Math.floor(Date.now() / 1000),
   };
 
-  return jwt.sign(payload, JWT_SECRET, {
-    expiresIn,
+  return jwt.sign(payload, SECRET, {
+    expiresIn: expiresIn as any,
     algorithm: 'HS256',
   });
 }
@@ -76,7 +78,7 @@ export function verifyJwt(token: string): {
   exp: number;
 } {
   try {
-    return jwt.verify(token, JWT_SECRET) as any;
+    return jwt.verify(token, SECRET) as any;
   } catch (err) {
     throw new Error('유효하지 않은 JWT 토큰입니다.');
   }
